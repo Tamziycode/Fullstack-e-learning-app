@@ -1,24 +1,24 @@
 const express = require('express')
+const dotenv = require("dotenv");
+dotenv.config();
 const app = express()
-const PORT = 5000
+
 const db = require('./db')
+
+
+
+const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 
+const authRoutes = require("./routes/Authroutes");
 
-app.get("/" , (req, res) => {
+// Use routes (prefix them with /api/auth)
+app.use("/api/auth", authRoutes);
 
+app.post("/", (req,res) => {
+    console.log("You have posted something")
 })
-app.post("/" , (req, res) => {
-
-})
-app.put("/" , (req, res) => {
-
-})
-app.delete("/" , (req, res) => {
-
-})
-
 
 app.listen(PORT, () => console.log(`Server has started on ${PORT}`))
 
