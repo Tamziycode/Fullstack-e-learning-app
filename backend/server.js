@@ -16,9 +16,5 @@ const authRoutes = require("./routes/Authroutes");
 // Use routes (prefix them with /api/auth)
 app.use("/api/auth", authRoutes);
 
-app.post("/", (req,res) => {
-    console.log("You have posted something")
-})
-
 app.listen(PORT, () => console.log(`Server has started on ${PORT}`))
 
