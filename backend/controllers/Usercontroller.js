@@ -3,7 +3,7 @@
 const pool = require ("../db.js");
 
 // Get user profile
-export const getUserProfile = async (req, res) => {
+const getUserProfile = async (req, res) => {
   try {
     const userId = req.user.id; // assuming user is from JWT middleware
     const [user] = await pool.query(
@@ -20,19 +20,51 @@ export const getUserProfile = async (req, res) => {
 };
 
 // Update user profile
-export const updateUserProfile = async (req, res) => {
+const updateUserProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { username, email } = req.body;
+    const { username, gender, email, password } = req.body;
 
-    const [updatedUser] = await pool.query(
-      "UPDATE users SET username = ?, email = ? WHERE id = ?",
-      [username, email, userId]
-    );
-    res.json({ message: "Profile updated", user: updatedUser });
+    // Build the dynamic update query
+    let fields = [];
+    let values = [];
+
+    if (username) {
+      fields.push("username = ?");
+      values.push(username);
+    }
+    if (gender) {
+      fields.push("gender = ?");
+      values.push(gender);
+    }
+    if (email) {
+      fields.push("email = ?");
+      values.push(email);
+    }
+
+    // Handle password separately for security
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      fields.push("password = ?");
+      values.push(hashedPassword);
+    }
+
+    if (fields.length === 0) {
+      return res.status(400).json({ message: "No fields to update" });
+    }
+
+    values.push(userId); // Add userId for WHERE clause
+
+    const query = `UPDATE users SET ${fields.join(", ")} WHERE id = ?`;
+
+    await pool.query(query, values);
+
+    res.json({ message: "Profile updated successfully" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-module.export = { updateUserProfile, getUserProfile }
+
+module.exports = { updateUserProfile, getUserProfile }

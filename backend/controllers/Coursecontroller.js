@@ -4,23 +4,28 @@
 const pool = require ("../db.js");
 
 // Create course (instructor only)
-export const createCourse = async (req, res) => {
+const createCourse = async (req, res) => {
   try {
     const { title, description, price, category, difficulty, videourl, previewvideourl } = req.body;
-    const instructorId = req.user.id; // user from token
+    const instructorId = req.user?.id; // safe check
 
-    const [result] = await pool.query (
-      "INSERT INTO courses (title, description, category, previewVideoUrl, videourl, price, difficulty) Values (?, ?, ?, ?, ?, ?, ?)",
-      [ title, description, category, previewvideourl, videourl, price, difficulty]
-    )
-    res.status(201).json({ message: "Course created", course });
+    console.log("User:", req.user);
+
+    const [result] = await pool.query(
+      "INSERT INTO courses (title, description, category, previewVideoUrl, videourl, price, difficulty) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [title, description, category, previewvideourl, videourl, price, difficulty]
+    );
+
+    res.status(201).json({ message: "Course created", id: result.insertId });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Error creating course:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
+
 // Get all courses
-export const getAllCourses = async (req, res) => {
+const getAllCourses = async (req, res) => {
   try {
     const [courses] = await pool.query (
       "SELECT * FROM courses"
@@ -32,7 +37,7 @@ export const getAllCourses = async (req, res) => {
 };
 
 // Get single course
-export const getCourseById = async (req, res) => {
+const getCourseById = async (req, res) => {
   try {
     const { id } = req.params;
     const [course] = await pool.query (

@@ -3,27 +3,35 @@
 const pool = require("../db")
 
 // Enroll in a course
- const enrollCourse = async (req, res) => {
+const enrollCourse = async (req, res) => {
   try {
     const userId = req.user.id;
     const { courseId } = req.body;
 
-    // check if already enrolled
-    const existing = await pool.query(
-      "SELECT * FROM user_courses WHERE userId = ? AND courseId = ?;",
-      [ userId, courseId ]
+    // Check if already enrolled
+    const [existing] = await pool.query(
+      "SELECT * FROM user_courses WHERE userId = ? AND courseId = ?",
+      [userId, courseId]
     );
-    if (existing) {
+    
+    if (existing.length > 0) {  // Check array length!
       return res.status(400).json({ message: "Already enrolled" });
     }
 
-    const [enrollment] = await pool.query("SELECT * FROM user_courses WHERE userId = ? AND courseId = ?;",
-      [ userId, courseId ] 
-    ); 
+    // Actually INSERT the enrollment (this was missing!)
+    const [result] = await pool.query(
+      "INSERT INTO user_courses (userId, courseId) VALUES (?, ?)",
+      [userId, courseId]
+    );
 
-    res.status(201).json({ message: "Enrolled successfully", enrollment });
+    res.status(201).json({ 
+      message: "Enrolled successfully", 
+      enrollmentId: result.insertId 
+    });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error(err);
+    res.status(500).json({ message: "Server error" })
+    console.log(err);
   }
 };
 

@@ -5,8 +5,11 @@ const{ getAllCourses, getCourseById, createCourse } = require("../controllers/Co
 
 const router = express.Router();
 
-router.post("/", createCourse);
-router.get("/", getAllCourses);
-router.get("/:id", getCourseById);
+const {authorizeRole} = require("../middleware/role");
+const { protect } = require("../middleware/auth");
+
+router.post("/", protect, authorizeRole("instructor"), createCourse);
+router.get("/", protect, getAllCourses);
+router.get("/:id", protect, getCourseById);
 
 module.exports = router;

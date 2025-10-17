@@ -7,7 +7,7 @@ const pool = require ("../db.js");
 
 const signup = async (req,res) => {
     try {
-        const { username, email, password, cpassword, gender } = req.body;
+        const { username, email, password, cPassword, gender, role } = req.body;
 
         const [existing] = await pool.query(
             "SELECT * FROM users WHERE email = ?",
@@ -18,7 +18,7 @@ const signup = async (req,res) => {
             return res.status(400).json({ message: "Email already registered" });
           }
 
-          if (password !== cpassword) {
+          if (password !== cPassword) {
             return res.status(400).json({ message: "Passwords do not match" });
           }
           
@@ -27,21 +27,22 @@ const signup = async (req,res) => {
 
           // 3. Insert new user
           const [result] = await pool.query(
-            "INSERT INTO users (email, username, password, gender) VALUES (?, ?, ?, ?)",
-            [email, username, hashedPassword, gender]
+            "INSERT INTO users (email, username, password, gender, role) VALUES (?, ?, ?, ?, ?)",
+            [email, username, hashedPassword, gender, role]
           );
       
           // 4. Generate token
           const token = jwt.sign(
-            { id: result.insertId, email },
+            { id: user.id, email: user.email, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: "24h" }
+            { expiresIn: "1d" }
           );
+          
       
           // 5. Respond
           res.status(201).json({
             message: "Signup successful",
-            user: { id: result.insertId, email, username, gender },
+            user: { id: result.insertId, email, username, gender, role },
             token,
           });
         } catch (error) {
@@ -75,10 +76,15 @@ const signin = async (req, res) => {
 
     // 3. Generate JWT token
     const token = jwt.sign(
-      { id: existing[0].id, email: existing[0].email },
+      { 
+        id: existing[0].id, 
+        email: existing[0].email, 
+        role: existing[0].role  // 👈 include this
+      },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
+    
 
     // 4. Respond with success
     res.json({
@@ -88,6 +94,7 @@ const signin = async (req, res) => {
         email: existing[0].email,
         username: existing[0].username,
         gender: existing[0].gender,
+        role: existing[0].role,
       },
       token,
     });
