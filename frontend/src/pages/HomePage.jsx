@@ -1,47 +1,73 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import CourseCard from "../components/CourseCard";
-import LoadingSkeleton from "../components/LoadingSkeleton"; // Optional, since you have it
+import LoadingSkeleton from "../components/LoadingSkeleton";
 
 const HomePage = () => {
+  const { token } = useAuth();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        // You have a protect middleware on GET /courses, so you must send the token
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:5000/courses", {
+        const res = await axios.get("http://localhost:5000/courses", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setCourses(response.data);
+        setCourses(res.data.slice(0, 6));
       } catch (err) {
-        setError("Failed to load courses. Please make sure you are logged in.");
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchCourses();
-  }, []);
+    if (token) fetchCourses();
+    else setLoading(false);
+  }, [token]);
 
   return (
     <>
-      <h1 style={{ textAlign: "center" }}>Welcome to Tamziy</h1>
-      {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
+      <div className="hero">
+        <h1>Learn Without Limits</h1>
+        <p>Thousands of courses to help you grow your skills and career.</p>
+        <div className="hero-buttons">
+          <button className="btn-white" onClick={() => navigate("/Courses")}>
+            Browse Courses
+          </button>
+          {!token && (
+            <button
+              className="btn-outline-white"
+              onClick={() => navigate("/Signup")}
+            >
+              Get Started Free
+            </button>
+          )}
+        </div>
+      </div>
 
-      <div className="homepage">
+      <div className="homepage-courses">
+        <h2>Featured Courses</h2>
         {loading ? (
-          // Render your skeleton or a simple loading text while fetching
-          <LoadingSkeleton />
+          <div className="courses-grid">
+            {[...Array(3)].map((_, i) => (
+              <LoadingSkeleton key={i} />
+            ))}
+          </div>
         ) : courses.length > 0 ? (
-          courses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))
+          <div className="courses-grid">
+            {courses.map((course) => (
+              <CourseCard key={course.id} course={course} />
+            ))}
+          </div>
         ) : (
-          <p>No courses available right now.</p>
+          <p style={{ color: "var(--text-muted)" }}>
+            {token
+              ? "No courses available yet."
+              : "Sign in to see available courses."}
+          </p>
         )}
       </div>
     </>

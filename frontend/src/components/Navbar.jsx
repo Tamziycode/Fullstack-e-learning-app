@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import cartIcon from "../assets/icons/cart.png";
@@ -6,6 +6,12 @@ import cartIcon from "../assets/icons/cart.png";
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    // Dark is default — only add "light" class when toggled
+    document.body.classList.toggle("light", !isDark);
+  }, [isDark]);
 
   const handleLogout = () => {
     logout();
@@ -15,16 +21,11 @@ const Navbar = () => {
   return (
     <header>
       <nav className="navbar">
-        <ul
-          style={{
-            display: "flex",
-            justifyContent: "space-around",
-            alignItems: "center",
-            listStyleType: "none",
-          }}
-        >
+        <ul>
           <li>
-            <Link to="/">Home</Link>
+            <Link to="/" className="logo">
+              Learnova
+            </Link>
           </li>
           <li>
             <Link to="/About">About</Link>
@@ -40,20 +41,16 @@ const Navbar = () => {
               </li>
               <li>
                 <Link to="/Cart">
-                  <img className="carticon" src={cartIcon} alt="CartIcon" />
+                  <img
+                    className="carticon"
+                    src={cartIcon}
+                    alt="Cart"
+                    style={{ width: 22, opacity: 0.7 }}
+                  />
                 </Link>
               </li>
               <li>
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    cursor: "pointer",
-                    background: "none",
-                    border: "none",
-                    color: "inherit",
-                    fontSize: "inherit",
-                  }}
-                >
+                <button className="nav-logout" onClick={handleLogout}>
                   Logout
                 </button>
               </li>
@@ -68,6 +65,16 @@ const Navbar = () => {
               </li>
             </>
           )}
+
+          <li>
+            <button
+              className="theme-toggle"
+              onClick={() => setIsDark(!isDark)}
+              title="Toggle theme"
+            >
+              {isDark ? "☀️" : "🌙"}
+            </button>
+          </li>
         </ul>
       </nav>
     </header>

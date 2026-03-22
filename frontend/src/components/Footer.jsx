@@ -6,32 +6,60 @@ import whatsapp from "../assets/socialmedia/whatsapp.png";
 import youtube from "../assets/socialmedia/youtube.png";
 
 const Footer = () => {
+  const socials = [
+    { src: twitter, alt: "Twitter" },
+    { src: facebook, alt: "Facebook" },
+    { src: instagram, alt: "Instagram" },
+    { src: whatsapp, alt: "WhatsApp" },
+    { src: youtube, alt: "YouTube" },
+  ];
+
   return (
     <footer
       style={{
-        margin: "0",
-        backgroundColor: "#213547",
-        border: "2px solid black",
-        padding: "5px",
+        background: "var(--bg-secondary)",
+        borderTop: "1px solid var(--border)",
+        padding: "1.5rem 2rem",
         display: "flex",
-        flexWrap: "wrap",
-        maxWidth: "100%",
-        overflowX: "hidden",
-        justifyContent: "center",
         alignItems: "center",
-        gap: "10px",
-        width: "100%",
-        color: "white",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: "1rem",
       }}
     >
-      <p style={{ fontWeight: "600", fontSize: "25px" }}>
-        &copy; 2025 Quick Learn Tamziy
+      <p
+        style={{
+          color: "var(--text-secondary)",
+          fontSize: "13px",
+          fontWeight: "500",
+        }}
+      >
+        © 2025{" "}
+        <span style={{ color: "var(--purple)", fontWeight: "700" }}>
+          Learnova
+        </span>
+        . All rights reserved.
       </p>
-      <img className="socialmedia" src={twitter} alt="" />
-      <img className="socialmedia" src={facebook} alt="" />
-      <img className="socialmedia" src={instagram} alt="" />
-      <img className="socialmedia" src={whatsapp} alt="" />
-      <img className="socialmedia" src={youtube} alt="" />
+
+      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        {socials.map(({ src, alt }) => (
+          <img
+            key={alt}
+            src={src}
+            alt={alt}
+            style={{
+              width: "24px",
+              height: "24px",
+              objectFit: "contain",
+              opacity: 0.6,
+              cursor: "pointer",
+              transition: "opacity 0.2s",
+            }}
+            onMouseEnter={(e) => (e.target.style.opacity = 1)}
+            onMouseLeave={(e) => (e.target.style.opacity = 0.6)}
+          />
+        ))}
+      </div>
     </footer>
   );
 };
