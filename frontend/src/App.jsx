@@ -10,7 +10,6 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import HomePage from "./pages/HomePage";
 import About from "./pages/About";
-import Cart from "./pages/Cart";
 import CourseDetail from "./pages/CourseDetail";
 import Courses from "./pages/Courses";
 import Dashboard from "./pages/Dashboard";
@@ -60,14 +59,6 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <CourseDetail />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/Cart"
-              element={
-                <ProtectedRoute>
-                  <Cart />
                 </ProtectedRoute>
               }
             />

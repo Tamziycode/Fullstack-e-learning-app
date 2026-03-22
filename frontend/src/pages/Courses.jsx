@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { useLocation } from "react-router-dom";
 import CourseCard from "../components/CourseCard";
 import LoadingSkeleton from "../components/LoadingSkeleton";
 
 const Courses = () => {
   const { token } = useAuth();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(params.get("search") || "");
   const [category, setCategory] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [enrolling, setEnrolling] = useState(null);
   const [enrollMsg, setEnrollMsg] = useState("");
 
+  // rest of the file stays exactly the same...
   useEffect(() => {
     const fetchCourses = async () => {
       try {
