@@ -1,6 +1,6 @@
 //controls the courses ie adding courses for instructor and getting all courses
 
-// Example: Course Controller
+
 const pool = require ("../db.js");
 
 // Create course (instructor only)

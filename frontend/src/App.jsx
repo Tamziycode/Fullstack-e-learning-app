@@ -1,9 +1,13 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import {
+  ProtectedRoute,
+  InstructorRoute,
+  PublicRoute,
+} from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
-import PricingList from "./components/PricingList";
 import Footer from "./components/Footer";
-import SearchBar from "./components/SearchBar";
 import HomePage from "./pages/HomePage";
 import About from "./pages/About";
 import Cart from "./pages/Cart";
@@ -12,24 +16,74 @@ import Courses from "./pages/Courses";
 import Dashboard from "./pages/Dashboard";
 import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
+
 const App = () => {
   return (
-    <div className="app">
-      <Navbar />
-      <main className="main-content">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/Courses" element={<Courses />} />
-          <Route path="/CourseDetail" element={<CourseDetail />} />
-          <Route path="/Cart" element={<Cart />} />
-          <Route path="/Dashboard" element={<Dashboard />} />
-          <Route path="/Signup" element={<Signup />} />
-          <Route path="/Signin" element={<Signin />} />
-          <Route path="/About" element={<About />} />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+    <AuthProvider>
+      <div className="app">
+        <Navbar />
+        <main className="main-content">
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/About" element={<About />} />
+
+            {/* Auth routes — redirect to dashboard if already logged in */}
+            <Route
+              path="/Signup"
+              element={
+                <PublicRoute>
+                  <Signup />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/Signin"
+              element={
+                <PublicRoute>
+                  <Signin />
+                </PublicRoute>
+              }
+            />
+
+            {/* Protected routes — must be logged in */}
+            <Route
+              path="/Courses"
+              element={
+                <ProtectedRoute>
+                  <Courses />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/course/:id"
+              element={
+                <ProtectedRoute>
+                  <CourseDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/Cart"
+              element={
+                <ProtectedRoute>
+                  <Cart />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/Dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </AuthProvider>
   );
 };
 

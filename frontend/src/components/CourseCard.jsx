@@ -1,20 +1,24 @@
 import React from "react";
-//This should be rendered dynamically from the details iin the database.
-//All the fields should ie title, description, category and video url.
-const CourseCard = () => {
+
+// Accept the course prop passed from HomePage
+const CourseCard = ({ course }) => {
   return (
     <div className="coursecard">
-      <img className="cardImage" src="" alt="" />
+      {/* Fallback image if previewVideoUrl/image is missing */}
+      <img
+        className="cardImage"
+        src={course?.previewVideoUrl || "https://via.placeholder.com/150"}
+        alt="Course Preview"
+      />
 
-      <p>Title:</p>
-      <p>Description:</p>
-      <p>Category:</p>
-      <p>Instructor:</p>
-      <p>Difficulty:</p>
-      <p>Price:</p>
+      <p>Title: {course?.title}</p>
+      <p>Description: {course?.description}</p>
+      <p>Category: {course?.category}</p>
+      <p>Difficulty: {course?.difficulty}</p>
+      <p>Price: ${course?.price}</p>
       <p>
-        Preview vid.This should be a video tag that shows previews of the video
-        on hover
+        {/* Placeholder for actual video tag implementation */}
+        Preview vid: {course?.previewVideoUrl}
       </p>
       <button>Enroll</button>
       <button>Details</button>

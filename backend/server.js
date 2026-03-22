@@ -18,7 +18,7 @@ const courseRoutes = require("./routes/Courseroutes");
 const enrollmentRoutes = require("./routes/Enrollmentroutes");
 const userRoutes = require("./routes/Userroutes");
 
-// Use routes (prefix them with /api/auth)
+// Use routes
 app.use("/api/auth", authRoutes);
 app.use("/courses", courseRoutes);
 app.use("/enroll", enrollmentRoutes);
