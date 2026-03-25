@@ -1,19 +1,20 @@
-//controls the courses ie adding courses for instructor and getting all courses
-
-
-const pool = require ("../db.js");
+const pool = require("../db.js");
 
 // Create course (instructor only)
 const createCourse = async (req, res) => {
   try {
-    const { title, description, price, category, difficulty, videourl, previewvideourl } = req.body;
-    const instructorId = req.user?.id; // safe check
-
-    console.log("User:", req.user);
+    const {
+      title,
+      description,
+      category,
+      difficulty,
+      videourl,
+      previewvideourl,
+    } = req.body;
 
     const [result] = await pool.query(
-      "INSERT INTO courses (title, description, category, previewVideoUrl, videourl, price, difficulty) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [title, description, category, previewvideourl, videourl, price, difficulty]
+      "INSERT INTO courses (title, description, category, previewVideoUrl, videourl, difficulty) VALUES (?, ?, ?, ?, ?, ?)",
+      [title, description, category, previewvideourl, videourl, difficulty]
     );
 
     res.status(201).json({ message: "Course created", id: result.insertId });
@@ -23,13 +24,10 @@ const createCourse = async (req, res) => {
   }
 };
 
-
 // Get all courses
 const getAllCourses = async (req, res) => {
   try {
-    const [courses] = await pool.query (
-      "SELECT * FROM courses"
-    )
+    const [courses] = await pool.query("SELECT * FROM courses");
     res.json(courses);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -40,16 +38,25 @@ const getAllCourses = async (req, res) => {
 const getCourseById = async (req, res) => {
   try {
     const { id } = req.params;
-    const [course] = await pool.query (
-      "SELECT * FROM courses WHERE id = ? ",
-      [id]
-    );
+    const [course] = await pool.query("SELECT * FROM courses WHERE id = ?", [
+      id,
+    ]);
     if (!course) return res.status(404).json({ message: "Course not found" });
-
     res.json(course);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 };
 
-module.exports = { getAllCourses, getCourseById, createCourse };
+// Delete course (instructor only)
+const deleteCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query("DELETE FROM courses WHERE id = ?", [id]);
+    res.json({ message: "Course deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { getAllCourses, getCourseById, createCourse, deleteCourse };

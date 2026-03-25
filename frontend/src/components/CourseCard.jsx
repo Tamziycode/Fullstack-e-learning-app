@@ -5,8 +5,8 @@ const difficultyColor = (level) => {
   if (!level) return "badge-purple";
   const l = level.toLowerCase();
   if (l === "beginner") return "badge-teal";
-  if (l === "intermediate") return "badge-warning";
-  return "badge-purple";
+  if (l === "intermediate") return "badge-amber";
+  return "badge-pink";
 };
 
 const CourseCard = ({ course, onEnroll, enrolling }) => {
@@ -37,14 +37,12 @@ const CourseCard = ({ course, onEnroll, enrolling }) => {
               {course.difficulty}
             </span>
           )}
+          <span className="badge badge-green">Free</span>
         </div>
       </div>
 
       <div className="card-footer">
-        <span className={`card-price ${course?.price == 0 ? "free" : ""}`}>
-          {course?.price == 0 ? "Free" : `$${course?.price}`}
-        </span>
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div style={{ display: "flex", gap: "8px", marginLeft: "auto" }}>
           <button
             className="btn btn-outline btn-sm"
             onClick={() => navigate(`/course/${course.id}`)}

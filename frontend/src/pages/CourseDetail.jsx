@@ -11,6 +11,60 @@ const difficultyColor = (level) => {
   return "badge-pink";
 };
 
+const getYouTubeId = (url) => {
+  if (!url) return null;
+  const patterns = [
+    /youtube\.com\/watch\?v=([^&]+)/,
+    /youtu\.be\/([^?]+)/,
+    /youtube\.com\/embed\/([^?]+)/,
+    /youtube\.com\/shorts\/([^?]+)/,
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+};
+
+const YouTubeEmbed = ({ url }) => {
+  const videoId = getYouTubeId(url);
+
+  if (!videoId) {
+    return (
+      <img
+        src={url}
+        alt="Course preview"
+        style={{
+          width: "100%",
+          maxHeight: "360px",
+          objectFit: "cover",
+          display: "block",
+        }}
+        onError={(e) => (e.target.style.display = "none")}
+      />
+    );
+  }
+
+  return (
+    <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
+      <iframe
+        src={`https://www.youtube.com/embed/${videoId}`}
+        title="Course preview"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          border: "none",
+        }}
+      />
+    </div>
+  );
+};
+
 const CourseDetail = () => {
   const { id } = useParams();
   const { token } = useAuth();
@@ -28,7 +82,6 @@ const CourseDetail = () => {
         const res = await axios.get(`http://localhost:5000/courses/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        // backend returns array for single course
         setCourse(Array.isArray(res.data) ? res.data[0] : res.data);
       } catch (err) {
         setError("Failed to load course.");
@@ -112,7 +165,7 @@ const CourseDetail = () => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 340px",
+          gridTemplateColumns: "1fr 300px",
           gap: "2rem",
           alignItems: "start",
         }}
@@ -147,7 +200,6 @@ const CourseDetail = () => {
                 </span>
               )}
             </div>
-
             <h1
               style={{
                 fontSize: "24px",
@@ -163,7 +215,6 @@ const CourseDetail = () => {
             >
               {course.title}
             </h1>
-
             <p
               style={{
                 color: "var(--text-secondary)",
@@ -175,7 +226,7 @@ const CourseDetail = () => {
             </p>
           </div>
 
-          {/* Preview image/video */}
+          {/* YouTube / preview */}
           <div
             style={{
               background: "var(--bg-card)",
@@ -187,17 +238,7 @@ const CourseDetail = () => {
             }}
           >
             {course.previewVideoUrl ? (
-              <img
-                src={course.previewVideoUrl}
-                alt={course.title}
-                style={{
-                  width: "100%",
-                  maxHeight: "360px",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-                onError={(e) => (e.target.style.display = "none")}
-              />
+              <YouTubeEmbed url={course.previewVideoUrl} />
             ) : (
               <div
                 style={{
@@ -279,7 +320,7 @@ const CourseDetail = () => {
           </div>
         </div>
 
-        {/* Right — enroll card (sticky) */}
+        {/* Right — enroll card */}
         <div style={{ position: "sticky", top: "80px" }}>
           <div
             style={{
@@ -293,15 +334,17 @@ const CourseDetail = () => {
               gap: "1rem",
             }}
           >
-            <div
+            {/* Free badge */}
+            <span
+              className="badge badge-green"
               style={{
-                fontSize: "32px",
-                fontWeight: "800",
-                color: course.price == 0 ? "var(--green)" : "var(--purple)",
+                alignSelf: "flex-start",
+                fontSize: "13px",
+                padding: "5px 14px",
               }}
             >
-              {course.price == 0 ? "Free" : `$${course.price}`}
-            </div>
+              Free
+            </span>
 
             {enrollMsg === "success" ? (
               <div
@@ -349,10 +392,6 @@ const CourseDetail = () => {
               {[
                 { label: "Category", value: course.category || "—" },
                 { label: "Difficulty", value: course.difficulty || "—" },
-                {
-                  label: "Price",
-                  value: course.price == 0 ? "Free" : `$${course.price}`,
-                },
               ].map(({ label, value }) => (
                 <div
                   key={label}

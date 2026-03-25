@@ -1,15 +1,15 @@
 //controls all the logic for users ie roles creation update and all of users
 // Example: User Controller
-const pool = require ("../db.js");
+const pool = require("../db.js");
+const bcrypt = require("bcrypt");
 
 // Get user profile
 const getUserProfile = async (req, res) => {
   try {
     const userId = req.user.id; // assuming user is from JWT middleware
-    const [user] = await pool.query(
-      "SELECT * FROM users WHERE id = ? ",
-      [userId]
-    );
+    const [user] = await pool.query("SELECT * FROM users WHERE id = ? ", [
+      userId,
+    ]);
     if (!user) return res.status(404).json({ message: "User not found" });
 
     res.json(user);
@@ -25,7 +25,7 @@ const updateUserProfile = async (req, res) => {
     const userId = req.user.id;
     const { username, gender, email, password } = req.body;
 
-    // Build the dynamic update query
+    // dynamic update query
     let fields = [];
     let values = [];
 
@@ -66,5 +66,4 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-
-module.exports = { updateUserProfile, getUserProfile }
+module.exports = { updateUserProfile, getUserProfile };
